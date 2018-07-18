@@ -49,3 +49,26 @@ function testPoly(p,eps)
     @show(val)
   end
 end
+
+function factorPoly(p)
+  t = roots(p)
+  h = Int8(floor(length(p)/2))
+  newT = im*zeros(h)
+  num = 0
+  while (num < h)
+    j = 1
+    while(t[j]==0)
+      j = j+1
+    end
+    newT[num+1] = t[j]
+    num = num+1
+    pair = t[j]
+    t[j] = 0
+    j = j+1
+    while(abs(inv(conj(pair))-t[j]) < .00001)
+      j = j+1
+    end
+    t[j] = 0
+  end
+  return(newT)
+end
