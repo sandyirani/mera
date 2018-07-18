@@ -28,19 +28,24 @@ r = C\b
 
 function applyPoly(p,x)
   n = length(p)
-  f = ones(n)
-  for j = 2:n
-    f[j] = f[j-1]*x
+  f = im*zeros(n)
+  h = Int8(floor(length(p)/2))
+  f[h+1] = 1
+  for j = 1:h
+    f[h+1+j] = f[h+j]*x
+    f[h+1-j] = f[h+2-j]/x
   end
   return(f'*p)
 end
 
-function testPoly(p,low,high,eps)
+function testPoly(p,eps)
 
-  for x = low:eps:high
-    val = applyPoly(p,x)
-    if (val < 0)
-      println(val)
+  for x = 0:eps:2*pi
+    w = exp(im*x)
+    val = applyPoly(p,w)
+    if (real(val) < 0)
+      @show(x, val)
     end
+    @show(val)
   end
 end
