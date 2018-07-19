@@ -75,7 +75,7 @@ function makeFourierMatrix(l, n, start, final)
 
    F = im*zeros(numIdx,l)
 
-   norm = 1/sqrt(2n)
+   norm = 1/sqrt(2*n)
 
    for j = startIdx:finalIdx
    	for k = 1:l
@@ -90,8 +90,8 @@ end
 
 
 function getFourier(v, a, b)
-
-  F = makeFourierMatrix(length(v),5000, a, b)
+  n = 2000
+  F = makeFourierMatrix(length(v),n, a, b)
   f = F*v
   f = abs2.(f)
   f
@@ -100,7 +100,7 @@ end
 
 
 
-L = 2
+L = 4
 K = 3
 tau = 1/2
 d = ones(L+1)
@@ -133,4 +133,6 @@ for j = 1:length(h)
     w[2*j-1] = g[j]
     w[2*j] = h[j]
 end
+w = w/sqrt(w'*w)
+@show(w'*w)
 mag = getFourier(w,0,2);
