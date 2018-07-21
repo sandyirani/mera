@@ -46,6 +46,7 @@ function test2(L)
     d2 = [d[length(d)-j+1] for j = 1:length(d)]
     for j = 1:length(vals)
         out = apply(d,vals[j])/apply(d2,vals[j])
+
         out = apply(d2,vals[j])
         #out = apply(d,vals[j])
         diff = out - (1/(vals[j]^tau))
