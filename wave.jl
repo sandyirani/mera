@@ -70,7 +70,7 @@ end
 function makeFourierMatrix(l, n, start, final)
 
    startIdx = Int32(ceil(start*n))
-   finalIdx = Int32(floor(final*n))
+   finalIdx = Int32(ceil(final*n)-1)
    numIdx = (finalIdx - startIdx + 1)
 
    F = im*zeros(numIdx,l)
@@ -89,26 +89,51 @@ end
 
 
 
-function getFourier(v, a, b)
-  n = 2000
+function getFourier(v, a, b, n)
+  vNorm = v/sqrt(v'*v)
   F = makeFourierMatrix(length(v),n, a, b)
-  f = F*v
+  f = F*vNorm
   f = abs2.(f)
   f
+end
 
+function getTargetPhase(start, final, n)
+  startIdx = Int32(ceil(start*n))
+  finalIdx = Int32(ceil(final*n)-1)
+  numIdx = (finalIdx - startIdx + 1)
+  F = [exp(-im*pi*j/(2*n)) for j = startIdx:finalIdx]
+  return(F)
+end
+
+function getPhaseDiff(v, w, a, b, n)
+  vNorm = v/sqrt(v'*v)
+  wNorm = w/sqrt(w'*w)
+  F = makeFourierMatrix(length(v),n, a, b)
+  fv = F*vNorm
+  fw = F*wNorm
+  t = getTargetPhase(a, b, n)
+  return(abs2.(fv./fw - t))
+end
+
+function checkOffset(v,m)
+  sum = 0
+  for j = m+1:length(v)
+    sum = sum+v[j]*v[j-m]
+  end
+  return(sum)
 end
 
 
-
-L = 4
+L = 3
 K = 3
 tau = 1/2
 d = ones(L+1)
 for j = 2:L+1
   d[j] = d[j-1]*(L-j+2)*(L-j+2-tau)/(j-1)/(j-1+tau)
 end
+drev = [d[j] for j = length(d):-1:1]
 s1 = [binomial(2*K,j) for j = 0:2*K]
-s2 = conv(d,[d[j] for j = length(d):-1:1])
+s2 = conv(d,drev)
 s = conv(s1,s2)
 M = K+L
 C = zeros(4*M-1,2*M-1)
@@ -127,7 +152,7 @@ q = factorPoly(r)
 bk = [binomial(K,j) for j = 0:K]
 f = conv(q,bk)
 h = conv(f,d)
-g = conv(f,[d[j] for j = length(d):-1:1])
+g = conv(f,drev)
 w = zeros(length(h)+length(g))
 for j = 1:length(h)
     w[2*j-1] = g[j]
@@ -135,4 +160,4 @@ for j = 1:length(h)
 end
 w = w/sqrt(w'*w)
 @show(w'*w)
-mag = getFourier(w,0,2);
+mag = getFourier(w,0,2,20);
