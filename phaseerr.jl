@@ -1,5 +1,6 @@
-L = 4
+L = 5
 tau = 1/2
+taup = -(L-tau)/2
 n = 10
 
 function makeD()
@@ -11,12 +12,25 @@ function makeD()
     return(d)
 end
 
+function testD(d)
+    d2 = copy(d)
+    s = [j+taup for j = 0:length(d)-1]
+    d2 = d2 .* s
+    p = zeros(n)
+    for j = 1:n
+        p[j] = sum(d2)
+        d2 = d2 .* s
+        d2 = d2 .* s
+    end
+    return(p)
+end
+
 function makeQ(d)
     d2 = copy(d)
     sq = [j^2 for j = 0:length(d)-1]
-    a = ones[n]
+    a = ones(n)
     for j = 2:n
-        a[j] = -1 * a[j-1] * tau^2 / (2*j) / (2*j-1)
+        a[j] = -1 * a[j-1] * taup^2 / (2*j) / (2*j-1)
     end
     b = ones(n)
     for j = 1:n
@@ -28,7 +42,7 @@ end
 
 function makeP(d)
     d2 = copy(d)
-    s = [j+tau for j = 0:length(d)-1]
+    s = [j+taup for j = 0:length(d)-1]
     d2 = d2 .* s
     p = zeros(n)
     for j = 1:n
@@ -44,4 +58,12 @@ function makeR()
     p = makeP(d)
     q = makeQ(d)
     r = zeros(n)
+    for k = 0:n-1
+        r[k+1] = p[k+1]
+        for j = 1:k
+            r[k+1] = r[k+1] - (r[k-j+1]*q[j+1])
+        end
+        r[k+1] = r[k+1]/q[1]
+    end
+    return(r)
 end
