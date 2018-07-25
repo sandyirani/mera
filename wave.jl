@@ -126,13 +126,8 @@ function checkOffset(v,m)
 end
 
 
-<<<<<<< HEAD
 L = 5
 K = 2
-=======
-L = 3
-K = 3
->>>>>>> c0f4c8485cb0f55c135d5d58d5c30c419e55d670
 tau = 1/2
 d = ones(L+1)
 for j = 2:L+1
