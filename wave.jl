@@ -31,32 +31,34 @@ function factorPoly(p)
   t = roots(p)
   h = Int8(floor(length(p)/2))
   newT = im*zeros(h)
-  num = 0
-  while (num < h)
-    j = 1
-    while(t[j]==0)
-      j = j+1
-    end
-    newT[num+1] = t[j]
-    num = num+1
-    pair = t[j]
-    t[j] = 0
-    j = j+1
-    while(abs(inv(conj(pair))-t[j]) < .00001)
-      j = j+1
-    end
-    t[j] = 0
-  end
-  newT = real(newT)
-  q = createPolyFromRoots(newT)
+  #This assumes that the roots are given in sorted order according to magnitude
+  newT = t[1:h]
+  q = createPolyFromRootsIm(newT)
   q = q * sqrt(p[h+1])
-  return(q)
+  if (sum(abs.(imag(q))) > .00001)
+      println("Polynomial should have real coefficients")
+  end
+  return(real(q))
 end
 
 function createPolyFromRoots(r)
     p = zeros(length(r)+1)
     a = zeros(length(r)+1)
     b = zeros(length(r)+1)
+    p[2] = 1
+    p[1] = -r[1]
+    for j = 2:length(r)
+        a[2:j+1] = p[1:j]
+        b[1:j] = -r[j]*p[1:j]
+        p = a + b
+    end
+    return(p)
+end
+
+function createPolyFromRootsIm(r)
+    p = im*zeros(length(r)+1)
+    a = im*zeros(length(r)+1)
+    b = im*zeros(length(r)+1)
     p[2] = 1
     p[1] = -r[1]
     for j = 2:length(r)
@@ -100,8 +102,8 @@ end
 
 
 
-L = 4
-K = 3
+L = 5
+K = 2
 tau = 1/2
 d = ones(L+1)
 for j = 2:L+1
