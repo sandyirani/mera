@@ -150,6 +150,7 @@ C = C[2:2:size(C,1),:]
 b = zeros(2*M-1)
 b[M] = 1
 r = C\b
+
 q = factorPoly(r)
 bk = [binomial(K,j) for j = 0:K]
 f = conv(q,bk)
