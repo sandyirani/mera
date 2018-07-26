@@ -162,4 +162,4 @@ for j = 1:length(h)
 end
 w = w/sqrt(w'*w)
 @show(w'*w)
-mag = getFourier(w,0,2,20);
+mag = getFourier(w,0,2,10);
