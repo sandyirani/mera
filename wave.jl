@@ -70,26 +70,18 @@ function createPolyFromRootsIm(r)
 end
 
 function makeFourierMatrix(l, n, start, final)
-
    startIdx = Int32(ceil(start*n))
    finalIdx = Int32(ceil(final*n)-1)
    numIdx = (finalIdx - startIdx + 1)
-
    F = im*zeros(numIdx,l)
-
    norm = 1/sqrt(2*n)
-
    for j = startIdx:finalIdx
    	for k = 1:l
    		F[j-startIdx+1,k] = norm*exp(im*pi*j*(k-1)/n)
    	end
    end
-
    F
-
 end
-
-
 
 function getFourier(v, a, b, n)
   vNorm = v/sqrt(v'*v)
