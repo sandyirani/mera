@@ -96,14 +96,17 @@ function phase(a,b,m)
   ang = genAngles(a,b,m)
   p = zeros(length(ang))
   p2 = zeros(length(ang))
+  p3 = zeros(length(ang))
   diff = zeros(length(ang))
   d = makeD()
   for j = 1:length(ang)
     s = [sin(ang[j]*k) for k = 0:length(d)-1]
     c = [cos(ang[j]*k) for k = 0:length(d)-1]
-    p[j] = 2 * atan((d'*s) / (d'*c)) - ((L+.5)*ang[j])
-    p2[j] = (d'*s) / (d'*c) - tan((L+.5)*ang[j]/2)
+    p[j] = 2 * atan((d'*s) / (d'*c)) - (L*ang[j])
     diff[j] = abs2.(exp(im*p[j]) - exp(-im*ang[j]/2))
+    p[j] = p[j] + .5*ang[j]
+    p2[j] = (d'*s) / (d'*c) - tan((L-.5)*ang[j]/2)
+    p3[j] = p2[j] * (cos((L-.5)*ang[j]/2))^2
     while (p[j] >= 2*pi)
       p[j] = p[j] - 2*pi
     end
@@ -111,5 +114,5 @@ function phase(a,b,m)
       p[j] = p[j] + 2*pi
     end
   end
-  return(p,p2,diff)
+  return(p,p2,p3,diff)
 end
