@@ -73,3 +73,43 @@ function makeR()
     end
     return(r)
 end
+
+function genAngles(a,b,m)
+  startIdx = Int32(ceil(a*m))
+  finalIdx = Int32(ceil(b*m)-1)
+  numIdx = (finalIdx - startIdx + 1)
+  angles = [pi*j/m for j = 0:numIdx-1]
+end
+
+function phaseErr(a,b,m)
+     r = makeR()
+     ang = genAngles(a,b,m)
+     err = zeros(length(ang))
+     for j = 1:length(ang)
+       v = [(ang[j])^k for k = 0:length(r)-1]
+       err[j] = v'*r
+     end
+     err
+end
+
+function phase(a,b,m)
+  ang = genAngles(a,b,m)
+  p = zeros(length(ang))
+  p2 = zeros(length(ang))
+  diff = zeros(length(ang))
+  d = makeD()
+  for j = 1:length(ang)
+    s = [sin(ang[j]*k) for k = 0:length(d)-1]
+    c = [cos(ang[j]*k) for k = 0:length(d)-1]
+    p[j] = 2 * atan((d'*s) / (d'*c)) - ((L+.5)*ang[j])
+    p2[j] = (d'*s) / (d'*c) - tan((L+.5)*ang[j]/2)
+    diff[j] = abs2.(exp(im*p[j]) - exp(-im*ang[j]/2))
+    while (p[j] >= 2*pi)
+      p[j] = p[j] - 2*pi
+    end
+    while (p[j] < 0)
+      p[j] = p[j] + 2*pi
+    end
+  end
+  return(p,p2,diff)
+end

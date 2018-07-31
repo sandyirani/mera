@@ -118,7 +118,7 @@ function checkOffset(v,m)
 end
 
 
-L = 5
+L = 2
 K = 2
 tau = 1/2
 d = ones(L+1)
