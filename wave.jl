@@ -74,8 +74,7 @@ function makeFourierMatrix(l, n, start, final)
    finalIdx = Int32(ceil(final*n)-1)
    numIdx = (finalIdx - startIdx + 1)
    F = im*zeros(numIdx,l)
-   #norm = 1/sqrt(2*n)
-   norm = 1
+   norm = 1/sqrt(2*n)
    for j = startIdx:finalIdx
    	for k = 1:l
    		F[j-startIdx+1,k] = norm*exp(im*pi*j*(k-1)/n)
@@ -119,41 +118,41 @@ function checkOffset(v,m)
 end
 
 
-function makeWavelet(K,L)
-    tau = 1/2
-    d = ones(L+1)
-    for j = 2:L+1
-      d[j] = d[j-1]*(L-j+2)*(L-j+2-tau)/(j-1)/(j-1+tau)
-    end
-    drev = [d[j] for j = length(d):-1:1]
-    s1 = [binomial(2*K,j) for j = 0:2*K]
-    s2 = conv(d,drev)
-    s = conv(s1,s2)
-    M = K+L
-    C = zeros(4*M-1,2*M-1)
-    for j = 1:4*M-1
-      last = min(j,2*M-1)
-      first = max(1,j-2*M)
-      ffirst = max(1,j-2*M+2)
-      flast = last-first+ffirst
-      C[j,first:last] = s[flast:-1:ffirst]
-    end
-    C = C[2:2:size(C,1),:]
-    b = zeros(2*M-1)
-    b[M] = 1
-    r = C\b
-
-    q = factorPoly(r)
-    bk = [binomial(K,j) for j = 0:K]
-    f = conv(q,bk)
-    h = conv(f,d)
-    g = conv(f,drev)
-    w = zeros(length(h)+length(g))
-    for j = 1:length(h)
-        w[2*j-1] = g[j]
-        w[2*j] = h[j]
-    end
-    return(d, r, q, bk, h, g, w)
+L = 2
+K = 2
+tau = 1/2
+d = ones(L+1)
+for j = 2:L+1
+  d[j] = d[j-1]*(L-j+2)*(L-j+2-tau)/(j-1)/(j-1+tau)
 end
+drev = [d[j] for j = length(d):-1:1]
+s1 = [binomial(2*K,j) for j = 0:2*K]
+s2 = conv(d,drev)
+s = conv(s1,s2)
+M = K+L
+C = zeros(4*M-1,2*M-1)
+for j = 1:4*M-1
+  last = min(j,2*M-1)
+  first = max(1,j-2*M)
+  ffirst = max(1,j-2*M+2)
+  flast = last-first+ffirst
+  C[j,first:last] = s[flast:-1:ffirst]
+end
+C = C[2:2:size(C,1),:]
+b = zeros(2*M-1)
+b[M] = 1
+r = C\b
 
-(d, r, q, k, h, g, w) = makeWavelet(2,5)
+q = factorPoly(r)
+bk = [binomial(K,j) for j = 0:K]
+f = conv(q,bk)
+h = conv(f,d)
+g = conv(f,drev)
+w = zeros(length(h)+length(g))
+for j = 1:length(h)
+    w[2*j-1] = g[j]
+    w[2*j] = h[j]
+end
+w = w/sqrt(w'*w)
+@show(w'*w)
+mag = getFourier(w,0,2,10);
