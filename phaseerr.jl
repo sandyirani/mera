@@ -1,4 +1,4 @@
-L = 2
+L = 6
 tau = 1/2
 taup = -(L-tau)/2
 n = 20
@@ -94,41 +94,44 @@ end
 
 function phase(a,b,m)
   ang = genAngles(a,b,m)
-  p = zeros(length(ang))
-  p2 = zeros(length(ang))
-  p3 = zeros(length(ang))
+  ph = zeros(length(ang))
+  del = zeros(length(ang))
+  eps = zeros(length(ang))
+  eps2 = zeros(length(ang))
   diff = zeros(length(ang))
   d = makeD()
   for j = 1:length(ang)
     s = [sin(ang[j]*k) for k = 0:length(d)-1]
     c = [cos(ang[j]*k) for k = 0:length(d)-1]
-    p[j] = 2 * atan((d'*s) / (d'*c)) - (L*ang[j])
-    diff[j] = abs2.(exp(im*p[j]) - exp(-im*ang[j]/2))
-    p[j] = p[j] + .5*ang[j]
-    p2[j] = (d'*s) / (d'*c) - tan((L-.5)*ang[j]/2)
-    p3[j] = p2[j] * (cos((L-.5)*ang[j]/2))^2
-    while (p[j] >= 2*pi)
-      p[j] = p[j] - 2*pi
+    ph[j] = 2 * atan((d'*s) / (d'*c)) - (L*ang[j])
+    diff[j] = abs2.(exp(im*ph[j]) - exp(-im*ang[j]/2))
+    del[j] = ph[j] + .5*ang[j]
+    eps[j] = (d'*s) / (d'*c) - tan((L-.5)*ang[j]/2)
+    eps2[j] = eps[j] * (cos((L-.5)*ang[j]/2))^2
+    while (del[j] >= 2*pi)
+      del[j] = del[j] - 2*pi
     end
-    while (p[j] < 0)
-      p[j] = p[j] + 2*pi
+    while (del[j] < 0)
+      del[j] = del[j] + 2*pi
     end
   end
-  return(p,p2,p3,diff)
+  return(ph,del,eps,eps2,diff)
 end
 
-function checkP(a,b,m)
-    ang = genAngles(a,b,m)
-    d = makeD()
-    err = zeros(length(ang))
-    err2 = zeros(length(ang))
-    p = makeP(d)
-    for j = 1:length(ang)
-      s = [sin(ang[j]*(k+.5)) for k = 0:length(d)-1]
-      err2[j] = d'*s
-      w = [ang[j]^k for k = 0:length(p)-1]
-      err[j] = w'*p
-    end
-    return(err,err2)
-
+function phase2(a,b,m)
+  ang = genAngles(a,b,m)
+  num = zeros(length(ang))
+  den = zeros(length(ang))
+  co = zeros(length(ang))
+  test = zeros(length(ang))
+  d = makeD()
+  for j = 1:length(ang)
+    s = [sin(ang[j]*(k+taup)) for k = 0:length(d)-1]
+    c = [cos(ang[j]*k) for k = 0:length(d)-1]
+    num[j] = d' * s
+    den[j] = d' * c
+    co[j] = cos(ang[j]*taup)
+    test[j] = num[j] / (den[j]*co[j])
+  end
+  return(num,den,co)
 end
