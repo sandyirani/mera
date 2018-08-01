@@ -116,3 +116,19 @@ function phase(a,b,m)
   end
   return(p,p2,p3,diff)
 end
+
+function checkP(a,b,m)
+    ang = genAngles(a,b,m)
+    d = makeD()
+    err = zeros(length(ang))
+    err2 = zeros(length(ang))
+    p = makeP(d)
+    for j = 1:length(ang)
+      s = [sin(ang[j]*(k+.5)) for k = 0:length(d)-1]
+      err2[j] = d'*s
+      w = [ang[j]^k for k = 0:length(p)-1]
+      err[j] = w'*p
+    end
+    return(err,err2)
+
+end
