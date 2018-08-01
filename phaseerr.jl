@@ -123,7 +123,7 @@ function phase2(a,b,m)
   num = zeros(length(ang))
   den = zeros(length(ang))
   co = zeros(length(ang))
-  test = zeros(length(ang))
+  total = zeros(length(ang))
   d = makeD()
   for j = 1:length(ang)
     s = [sin(ang[j]*(k+taup)) for k = 0:length(d)-1]
@@ -131,7 +131,15 @@ function phase2(a,b,m)
     num[j] = d' * s
     den[j] = d' * c
     co[j] = cos(ang[j]*taup)
-    test[j] = num[j] / (den[j]*co[j])
+    total[j] = num[j] / (den[j]) * co[j]
   end
-  return(num,den,co)
+  return(num,den,co,total)
+end
+
+function output(a,b,c,d)
+  f = open("output.txt","w")
+  for j = 1:length(a)
+    write(f, string(a[j]), ", ", string(b[j]), ", ", string(c[j]), ", ", string(d[j]),"\n")
+  end
+  close(f)
 end
