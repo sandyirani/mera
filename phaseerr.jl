@@ -1,4 +1,4 @@
-L = 6
+L = 12
 tau = 1/2
 taup = -(L-tau)/2
 n = 20
@@ -57,6 +57,24 @@ function makeP(d)
       p[k+1] = p[k+1] * (-1)^k
     end
     return(p)
+end
+
+function makeP2(d)
+    d2 = copy(d)
+    s = [j+taup for j = 0:length(d)-1]
+    d2 = d2 .* s
+    p = zeros(n)
+    a = zeros(length(d),n)
+    len = Int8(floor(length(d)/2))
+    a2 = zeros(len,n)
+    for k = 0:n-1
+      a[:,k+1] = d2[:]
+      a2[:,k+1] = [d2[j]+d2[length(d)-j+1] for j = 1:len]
+      p[k+1] = sum(d2)
+      d2 = d2 .* s
+      d2 = d2 .* s
+    end
+    return(p,a,a2)
 end
 
 function makeR()
