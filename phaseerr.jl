@@ -1,4 +1,4 @@
-L = 12
+L = 8
 tau = 1/2
 taup = -(L-tau)/2
 n = 20
@@ -59,22 +59,22 @@ function makeP(d)
     return(p)
 end
 
-function makeP2(d)
+function pBreakdown(d)
     d2 = copy(d)
     s = [j+taup for j = 0:length(d)-1]
     d2 = d2 .* s
-    p = zeros(n)
+    aSum = zeros(n)
     a = zeros(length(d),n)
     len = Int8(floor(length(d)/2))
     a2 = zeros(len,n)
     for k = 0:n-1
       a[:,k+1] = d2[:]
       a2[:,k+1] = [d2[j]+d2[length(d)-j+1] for j = 1:len]
-      p[k+1] = sum(d2)
+      aSum[k+1] = sum(d2)
       d2 = d2 .* s
       d2 = d2 .* s
     end
-    return(p,a,a2)
+    return(aSum,a,a2)
 end
 
 function makeR()
@@ -155,9 +155,45 @@ function phase2(a,b,m)
 end
 
 function output(a,b,c,d)
+  @show(length(a))
+  @show(length(d))
   f = open("output.txt","w")
   for j = 1:length(a)
     write(f, string(a[j]), ", ", string(b[j]), ", ", string(c[j]), ", ", string(d[j]),"\n")
   end
   close(f)
+end
+
+function test(n)
+  d = makeD()
+  p = makeP(d)
+  ang = genAngles(0,1,n)
+  @show(length(ang))
+  ap = zeros(length(ang))
+  for w = 1:length(ang)
+    sum = 0
+    for k = 1:length(p)
+      sum = sum + p[k]*ang[w]^(2*k-1)
+    end
+    ap[w] = sum
+  end
+  bp = zeros(length(ang))
+  for w = 1:length(ang)
+    bp[w] = p[L+1]*ang[w]^(2*L+1)
+  end
+  cp = zeros(length(ang))
+  for w = 1:length(ang)
+    cp[w] = p[L+1]*ang[w]^(2*L+1) + p[L+2]*ang[w]^(2*L+3)
+  end
+  dp = zeros(length(ang))
+  (p,a,a2) = pBreakdown(d)
+  for w = 1:length(ang)
+    #d[w] = p[L+1]*ang[w]^(2*L+1) + p[L+2]*ang[w]^(2*L+3) + p[L+3]*ang[w]^(2*L+5)
+      sum = 0
+      for k = 1:length(p)
+        sum = sum + a[L+1,k]*ang[w]^(2*k-1)
+      end
+      dp[w] = sum
+  end
+  output(ap,bp,cp,dp)
 end
