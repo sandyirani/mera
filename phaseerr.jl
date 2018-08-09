@@ -187,11 +187,21 @@ function test(n)
   end
   dp = zeros(length(ang))
   (p,a,a2) = pBreakdown(d)
+  plen = length(p)
+  num = zeros(plen)
+  num[L+1:plen] = a[L+1,L+1:plen]
+  for m = 2*L+1:-1:1
+      num = num/m
+  end
+  for k = L+2:n
+    num[k:plen] = num[k:plen]/(2*k-1)
+    num[k:plen] = num[k:plen]/(2*k-2)
+  end
   for w = 1:length(ang)
     #d[w] = p[L+1]*ang[w]^(2*L+1) + p[L+2]*ang[w]^(2*L+3) + p[L+3]*ang[w]^(2*L+5)
       sum = 0
       for k = 1:length(p)
-        sum = sum + a[L+1,k]*ang[w]^(2*k-1)
+        sum = sum + num[k]*ang[w]^(2*k-1)
       end
       dp[w] = sum
   end
