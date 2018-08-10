@@ -186,7 +186,7 @@ function test(n)
     cp[w] = p[L+1]*ang[w]^(2*L+1) + p[L+2]*ang[w]^(2*L+3)
   end
   dp = zeros(length(ang))
-  (p,a,a2) = pBreakdown(d)
+  (asum,a,a2) = pBreakdown(d)
   plen = length(p)
   num = zeros(plen)
   num[L+1:plen] = a[L+1,L+1:plen]
@@ -197,6 +197,8 @@ function test(n)
     num[k:plen] = num[k:plen]/(2*k-1)
     num[k:plen] = num[k:plen]/(2*k-2)
   end
+  @show(num)
+  @show(p)
   for w = 1:length(ang)
     #d[w] = p[L+1]*ang[w]^(2*L+1) + p[L+2]*ang[w]^(2*L+3) + p[L+3]*ang[w]^(2*L+5)
       sum = 0
