@@ -1,4 +1,4 @@
-L = 6
+L = 12
 tau = 1/2
 taup = -(L-tau)/2
 n = 20
@@ -149,8 +149,9 @@ function phase2(a,b,m)
     num[j] = d' * s
     den[j] = d' * c
     co[j] = cos(ang[j]*taup)
-    total[j] = num[j] / (den[j]) * co[j]
+    total[j] = co[j] / (den[j])
   end
+  output(num,den,co,total)
   return(num,den,co,total)
 end
 
