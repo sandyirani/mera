@@ -189,11 +189,12 @@ function phase3(a,b,m)
   (c,c2) = qBreakdown(d)
   m = zeros(length(c2),length(ang))
   for w = 1:length(ang)
-    v = [(ang[w])^j for j = 0:length(c2)-1]
+    v = [(ang[w])^(2*j) for j = 0:length(c2)-1]
     col = c2 .* v
     m[:,w] = col[:]
   end
   msum = [sum(m[:,w]) for w = 1:length(ang)]
+  msum = msum/2
   return(msum)
 end
 
