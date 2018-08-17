@@ -1,4 +1,4 @@
-L = 12
+L = 6
 tau = 1/2
 taup = -(L-tau)/2
 n = 20
@@ -57,6 +57,24 @@ function makeP(d)
       p[k+1] = p[k+1] * (-1)^k
     end
     return(p)
+end
+
+function qBreakdown(d)
+    dp = copy(d)
+    dm = copy(d)
+    sp = [(j+taup)^2 for j = 0:length(d)-1]
+    sm = [(j-taup)^2 for j = 0:length(d)-1]
+    aSum = zeros(n)
+    for k = 0:n-1
+      aSum[k+1] = sum(dp) + sum(dm)
+      dp = dp .* sp
+      dm = dm .* sm
+    end
+    aSum2 = copy(aSum)
+    for k = 2:n
+      aSum2[k:n] = (-1)*aSum2[k:n]/((2*k-2)*(2*k-3))
+    end
+    return(aSum,aSum2)
 end
 
 function pBreakdown(d)
@@ -140,28 +158,46 @@ function phase2(a,b,m)
   ang = genAngles(a,b,m)
   num = zeros(length(ang))
   den = zeros(length(ang))
+  den2 = zeros(length(ang))
   co = zeros(length(ang))
   total = zeros(length(ang))
   total2 = zeros(length(ang))
   mid = zeros(length(ang))
   d = makeD()
-  d = d/sqrt(d'*d)
   midIdx = Int8(ceil(length(d)/2))
   for j = 1:length(ang)
     s = [sin(ang[j]*(k+taup)) for k = 0:length(d)-1]
     c = [cos(ang[j]*k) for k = 0:length(d)-1]
+    c2 = [.5(cos(ang[j]*(k+taup)) + cos(ang[j]*(k-taup))) for k = 0:length(d)-1]
     num[j] = d' * s
     den[j] = d' * c
+    den2[j] = d' * c2
     mid[j] = d[midIdx] * c[midIdx]
     co[j] = cos(ang[j]*taup)
     total[j] = co[j] / (den[j])
-    total2[j] = co[j] / (mid[j])
+    total2[j] = co[j] * (den[j])
   end
   #output(num,den,co,total)
   #return(num,den,co,total)
-  output(den,mid,total2,total)
-  return(den,mid,total2,total)
+  output(den,den2,total2,total)
+  return(den,den2,total2,total)
 end
+
+function phase3(a,b,m)
+  ang = genAngles(a,b,m)
+  d = makeD()
+  (c,c2) = qBreakdown(d)
+  m = zeros(length(c2),length(ang))
+  for w = 1:length(ang)
+    v = [(ang[w])^j for j = 0:length(c2)-1]
+    col = c2 .* v
+    m[:,w] = col[:]
+  end
+  msum = [sum(m[:,w]) for w = 1:length(ang)]
+  return(msum)
+end
+
+
 
 function output(a,b,c,d)
   @show(length(a))
