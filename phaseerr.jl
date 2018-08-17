@@ -145,6 +145,7 @@ function phase2(a,b,m)
   total2 = zeros(length(ang))
   mid = zeros(length(ang))
   d = makeD()
+  d = d/sqrt(d'*d)
   midIdx = Int8(ceil(length(d)/2))
   for j = 1:length(ang)
     s = [sin(ang[j]*(k+taup)) for k = 0:length(d)-1]
