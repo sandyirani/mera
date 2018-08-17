@@ -142,6 +142,7 @@ function phase2(a,b,m)
   den = zeros(length(ang))
   co = zeros(length(ang))
   total = zeros(length(ang))
+  total2 = zeros(length(ang))
   mid = zeros(length(ang))
   d = makeD()
   midIdx = Int8(ceil(length(d)/2))
@@ -153,11 +154,12 @@ function phase2(a,b,m)
     mid[j] = d[midIdx] * c[midIdx]
     co[j] = cos(ang[j]*taup)
     total[j] = co[j] / (den[j])
+    total2[j] = co[j] / (mid[j])
   end
   #output(num,den,co,total)
   #return(num,den,co,total)
-  output(den,mid,co,total)
-  return(den,mid,co,total)
+  output(den,mid,total2,total)
+  return(den,mid,total2,total)
 end
 
 function output(a,b,c,d)
