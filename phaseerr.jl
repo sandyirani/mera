@@ -198,6 +198,20 @@ function phase3(a,b,m)
   return(msum)
 end
 
+function phase4(a,b,m)
+  ang = genAngles(a,b,m)
+  sw = zeros(length(ang))
+  cw = zeros(length(ang))
+  d = makeD()
+  for w = 1:length(ang)
+    c = [cos(ang[w]*k) for k = 0:length(d)-1]
+    s = [sin(ang[w]*k) for k = 0:length(d)-1]
+    cw[w] = d'*c
+    sw[w] = d'*s
+  end
+  output(cw,cw,sw,sw)
+end
+
 
 
 function output(a,b,c,d)
