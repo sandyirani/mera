@@ -87,7 +87,7 @@ function getFourier(v, a, b, n)
   vNorm = v/sqrt(v'*v)
   F = makeFourierMatrix(length(v),n, a, b)
   f = F*vNorm
-  f = abs2.(f)
+  f = abs.(f)
   f
 end
 
@@ -117,9 +117,19 @@ function checkOffset(v,m)
   return(sum)
 end
 
+function output(a,b,c,d)
+  @show(length(a))
+  @show(length(d))
+  f = open("output.txt","w")
+  for j = 1:length(a)
+    write(f, string(a[j]), ", ", string(b[j]), ", ", string(c[j]), ", ", string(d[j]),"\n")
+  end
+  close(f)
+end
 
-L = 2
-K = 2
+
+L = 6
+K = 4
 tau = 1/2
 d = ones(L+1)
 for j = 2:L+1
@@ -146,6 +156,13 @@ r = C\b
 q = factorPoly(r)
 bk = [binomial(K,j) for j = 0:K]
 f = conv(q,bk)
+
+Fq = getFourier(q,0,1,100)
+Fd = getFourier(d,0,1,100)
+Fbk = getFourier(bk,0,1,100)
+Ff = getFourier(f,0,1,100)
+output(Fq,Fd,Fbk,Ff)
+
 h = conv(f,d)
 g = conv(f,drev)
 w = zeros(length(h)+length(g))
