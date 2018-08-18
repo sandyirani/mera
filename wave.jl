@@ -34,7 +34,9 @@ function factorPoly(p)
   #This assumes that the roots are given in sorted order according to magnitude
   newT = t[1:h]
   q = createPolyFromRootsIm(newT)
-  q = q * sqrt(p[h+1])
+  @show(prod(newT))
+  q = q * sqrt(p[1]/prod(newT))
+  #q = q * sqrt(p[1])
   if (sum(abs.(imag(q))) > .00001)
       println("Polynomial should have real coefficients")
   end
