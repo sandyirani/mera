@@ -77,6 +77,7 @@ function makeFourierMatrix(l, n, start, final)
    numIdx = (finalIdx - startIdx + 1)
    F = im*zeros(numIdx,l)
    norm = 1/sqrt(2*n)
+   norm = 1
    for j = startIdx:finalIdx
    	for k = 1:l
    		F[j-startIdx+1,k] = norm*exp(im*pi*j*(k-1)/n)
@@ -87,6 +88,7 @@ end
 
 function getFourier(v, a, b, n)
   vNorm = v/sqrt(v'*v)
+  vNorm = v
   F = makeFourierMatrix(length(v),n, a, b)
   f = F*vNorm
   f = abs.(f)
@@ -159,21 +161,22 @@ r = C\b
 q = factorPoly(r)
 bk = [binomial(K,j) for j = 0:K]
 f = conv(q,bk)
+g = conv(f,drev)
+h = conv(f,d)
+q = q/sqrt(g'*g)
+g = g/sqrt(g'*g)
+h = h/sqrt(h'*h)
+
+w = zeros(length(h)+length(g))
+for j = 1:length(h)
+    w[2*j-1] = g[j]/sqrt(2)
+    w[2*j] = h[j]/sqrt(2)
+end
 
 Fq = getFourier(q,0,1,100)
 Fd = getFourier(d,0,1,100)
 Fqd = getFourier(conv(q,d),0,1,100)
 Fbk = getFourier(bk,0,1,100)
 Ff = getFourier(f,0,1,100)
-output(Fq,Fd,Fqd,Ff)
-
-h = conv(f,d)
-g = conv(f,drev)
-w = zeros(length(h)+length(g))
-for j = 1:length(h)
-    w[2*j-1] = g[j]
-    w[2*j] = h[j]
-end
-w = w/sqrt(w'*w)
-@show(w'*w)
-mag = getFourier(w,0,2,10);
+Fw = getFourier(w,0,1,100)
+output(Fq,Fd,Fbk,Fw)
