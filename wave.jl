@@ -110,7 +110,7 @@ function getPhaseDiff(v, w, a, b, n)
   fv = F*vNorm
   fw = F*wNorm
   t = getTargetPhase(a, b, n)
-  return(abs2.(fv./fw - t))
+  return(abs.(fv./fw - t))
 end
 
 function checkOffset(v,m)
@@ -133,7 +133,7 @@ end
 
 
 L = 6
-K = 4
+K = 6
 tau = 1/2
 d = ones(L+1)
 for j = 2:L+1
@@ -160,6 +160,7 @@ r = C\b
 
 q = factorPoly(r)
 bk = [binomial(K,j) for j = 0:K]
+bk2 = [binomial(K,j)^2 for j = 0:K]
 f = conv(q,bk)
 g = conv(f,drev)
 h = conv(f,d)
@@ -176,7 +177,10 @@ end
 Fq = getFourier(q,0,1,100)
 Fd = getFourier(d,0,1,100)
 Fqd = getFourier(conv(q,d),0,1,100)
-Fbk = getFourier(bk,0,1,100)
+Fb = getFourier(bk,0,1,100)
+Fb2 = getFourier(bk2,0,1,100)
 Ff = getFourier(f,0,1,100)
 Fw = getFourier(w,0,1,100)
-output(Fq,Fd,Fbk,Fw)
+Fg = getFourier(g,0,1,100)
+phaseDiff = getPhaseDiff(h, g, 0, 1, 100)
+output(Fb,Fd,Fb2,Fg)
