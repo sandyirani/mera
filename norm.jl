@@ -8,7 +8,6 @@ function makeD(L)
 end
 
 function testPi()
-
     n = 20
     res = zeros(n)
     for j = 1:n
