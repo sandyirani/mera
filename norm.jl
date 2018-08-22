@@ -12,7 +12,7 @@ function testPi()
     res = zeros(n)
     for j = 1:n
         d = makeD(j)
-        p = [(exp(im*2.5))^k for k = 1:length(d)]
+        p = [(-1)^k for k = 1:length(d)]
         res[j] = abs.(d'*p)
     end
     return(res)
