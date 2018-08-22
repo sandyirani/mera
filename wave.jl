@@ -183,4 +183,5 @@ Ff = getFourier(f,0,1,100)
 Fw = getFourier(w,0,1,100)
 Fg = getFourier(g,0,1,100)
 phaseDiff = getPhaseDiff(h, g, 0, 1, 100)
-output(phaseDiff,Fqd,Fb,Fw)
+phaseDiff2 = phaseDiff .* Fd
+output(phaseDiff,phaseDiff2,Fb,Fd)
