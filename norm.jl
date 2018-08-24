@@ -24,11 +24,21 @@ function test2(L)
   a = d .* p
   h = Int8(floor((L+1)/2))
   b = [a[j] + a[L+2-j] for j = h:-1:1]
+  r = [b[j]/b[j-1] for j = 2:length(b)]
   c = zeros(length(b))
   c[1] = b[1]
   for j = 2:length(c)
     c[j] = c[j-1] + b[j]
   end
-  @show(sum(b))
-  return(c,b)
+  done = false
+  change = 0
+  for j = 2:length(c)
+      if (!done && c[j]*c[j-1] > 0)
+          change = j
+          done = true
+      end
+  end
+  #@show(change/h)
+  @show(c[length(c)]^2,c[1])
+  return(b,c,r)
 end
