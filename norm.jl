@@ -65,6 +65,8 @@ function test2(L)
   return(b,c,r,r2)
 end
 
+
+
 function testR(L)
     r = makeR(L)
     len = Int8(floor((length(r)+1)/2))
