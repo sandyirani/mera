@@ -159,6 +159,7 @@ b[M] = 1
 r = C\b
 
 q = factorPoly(r)
+#@show(q)
 bk = [binomial(K,j) for j = 0:K]
 bk2 = [binomial(K,j)^2 for j = 0:K]
 f = conv(q,bk)
@@ -167,6 +168,7 @@ h = conv(f,d)
 q = q/sqrt(g'*g)
 g = g/sqrt(g'*g)
 h = h/sqrt(h'*h)
+@show(conv(q,d))
 
 w = zeros(length(h)+length(g))
 for j = 1:length(h)
@@ -184,4 +186,4 @@ Fw = getFourier(w,0,1,100)
 Fg = getFourier(g,0,1,100)
 phaseDiff = getPhaseDiff(h, g, 0, 1, 100)
 phaseDiff2 = phaseDiff .* Fd
-output(phaseDiff,phaseDiff2,Fb,Fd)
+output(Fq,Fd,Fqd,Fd)
