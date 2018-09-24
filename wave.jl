@@ -132,7 +132,7 @@ function output(a,b,c,d)
 end
 
 
-L = 6
+L = 9
 K = 6
 tau = 1/2
 d = ones(L+1)
