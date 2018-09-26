@@ -131,6 +131,31 @@ function output(a,b,c,d)
   close(f)
 end
 
+function levels(g,gp)
+  n = length(g)
+  h = [(-1)^j*g[j] for j = n:-1:1]
+  hp = [(-1)^j*gp[j] for j = n:-1:1]
+
+  hdub = zeros(2*n)
+  hpdub = zeros(2*n)
+  for j = 1:n
+    hdub[2*j-1] = h[j]
+    hpdub[2*j-1] = hp[j]
+  end
+  big = conv(hdub,h)
+  bigp = conv(hpdub,hp)
+  w = zeros(length(big)+length(bigp))
+  for j = 1:length(big)
+      w[2*j-1] = big[j]/sqrt(2)
+      w[2*j] = bigp[j]/sqrt(2)
+  end
+  Fbig = getFourier(big,0,1,100)
+  Fbigp = getFourier(bigp,0,1,100)
+  Fw = getFourier(w,0,1,100)
+  output(Fbig,Fbigp,Fw,Fbigp)
+
+end
+
 
 L = 9
 K = 6
@@ -186,4 +211,4 @@ Fw = getFourier(w,0,1,100)
 Fg = getFourier(g,0,1,100)
 phaseDiff = getPhaseDiff(h, g, 0, 1, 100)
 phaseDiff2 = phaseDiff .* Fd
-output(Fq,Fd,Fqd,Fd)
+output(Fq,Fd,Fg,Fw)
