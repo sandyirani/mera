@@ -131,19 +131,21 @@ function output(a,b,c,d)
   close(f)
 end
 
-function levels(g,gp)
-  n = length(g)
-  h = [(-1)^j*g[j] for j = n:-1:1]
-  hp = [(-1)^j*gp[j] for j = n:-1:1]
+function levels(v,vp)
+  n = length(v)
+  g = [(-1)^(j-1)*v[j] for j = 1:n]
+  gp = [(-1)^(j-1)*vp[j] for j = 1:n]
+  h = [v[j] for j = n:-1:1]
+  hp = [vp[j] for j = n:-1:1]
 
-  hdub = zeros(2*n)
-  hpdub = zeros(2*n)
+  gdub = zeros(2*n)
+  gpdub = zeros(2*n)
   for j = 1:n
-    hdub[2*j-1] = h[j]
-    hpdub[2*j-1] = hp[j]
+    gdub[2*j-1] = g[j]
+    gpdub[2*j-1] = gp[j]
   end
-  big = conv(hdub,h)
-  bigp = conv(hpdub,hp)
+  big = conv(gdub,h)
+  bigp = conv(gpdub,hp)
   w = zeros(length(big)+length(bigp))
   for j = 1:length(big)
       w[2*j-1] = big[j]/sqrt(2)
@@ -198,7 +200,7 @@ h = h/sqrt(h'*h)
 w = zeros(length(h)+length(g))
 for j = 1:length(h)
     w[2*j-1] = g[j]/sqrt(2)
-    w[2*j] = h[j]/sqrt(2)
+    w[2*j] = -h[j]/sqrt(2)
 end
 
 Fq = getFourier(q,0,1,100)
