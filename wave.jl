@@ -71,16 +71,18 @@ function createPolyFromRootsIm(r)
     return(p)
 end
 
+function genAngles(a,b,m)
+  angles = [pi*(a + (b-a)*j/(m-1)) for j = 0:m-1]
+end
+
 function makeFourierMatrix(l, n, start, final)
-   startIdx = Int32(ceil(start*n))
-   finalIdx = Int32(ceil(final*n)-1)
-   numIdx = (finalIdx - startIdx + 1)
-   F = im*zeros(numIdx,l)
+   angles = genAngles(start, final, n)
+   F = im*zeros(length(angles),l)
    norm = 1/sqrt(2*n)
    norm = 1
-   for j = startIdx:finalIdx
+   for j = 1:length(angles)
    	for k = 1:l
-   		F[j-startIdx+1,k] = norm*exp(im*pi*j*(k-1)/n)
+   		F[j,k] = norm*exp(-im*angles[j]*(k-1))
    	end
    end
    F
@@ -95,21 +97,20 @@ function getFourier(v, a, b, n)
   f
 end
 
-function getTargetPhase(start, final, n)
-  startIdx = Int32(ceil(start*n))
-  finalIdx = Int32(ceil(final*n)-1)
-  numIdx = (finalIdx - startIdx + 1)
-  F = [exp(-im*pi*j/(2*n)) for j = startIdx:finalIdx]
+function getTargetPhase(add,mult,start, final, n)
+  angles = genAngles(start, final, n)
+  F = [exp(im*angles[j]*mult + add*pi) for j = 1:length(angles)]
   return(F)
 end
 
-function getPhaseDiff(v, w, a, b, n)
+function getPhaseDiff(add, mult,v, w, a, b, n)
   vNorm = v/sqrt(v'*v)
   wNorm = w/sqrt(w'*w)
   F = makeFourierMatrix(length(v),n, a, b)
   fv = F*vNorm
   fw = F*wNorm
-  t = getTargetPhase(a, b, n)
+  t = getTargetPhase(add, mult,a, b, n)
+
   return(abs.(fv./fw - t))
 end
 
@@ -131,29 +132,72 @@ function output(a,b,c,d)
   close(f)
 end
 
-function levels(g,gp)
-  n = length(g)
-  h = [(-1)^j*g[j] for j = n:-1:1]
-  hp = [(-1)^j*gp[j] for j = n:-1:1]
-
-  hdub = zeros(2*n)
-  hpdub = zeros(2*n)
-  for j = 1:n
-    hdub[2*j-1] = h[j]
-    hpdub[2*j-1] = hp[j]
+function space(v,m)
+  v2 = zeros(length(v)*m)
+  for j = 1:length(v)
+    v2[(j-1)*m+1] = v[j]
   end
-  big = conv(hdub,h)
-  bigp = conv(hpdub,hp)
+  return(v2)
+end
+
+function level2(v,vp)
+  n = length(v)
+  g = [(-1)^j*v[j+1] for j = 0:n-1]
+  gp = [(-1)^j*vp[j+1] for j = 0:n-1]
+  vh = [(-1)^(j-1)*v[j] for j = n:-1:1]
+  vhp = [(-1)^(j-1)*vp[j] for j = n:-1:1]
+
+  gdub = space(g, 2)
+  gpdub = space(gp,2)
+  big = conv(gdub,vh)
+  bigp = conv(gpdub,vhp)
   w = zeros(length(big)+length(bigp))
   for j = 1:length(big)
       w[2*j-1] = big[j]/sqrt(2)
-      w[2*j] = bigp[j]/sqrt(2)
+      w[2*j] = -bigp[j]/sqrt(2)
   end
-  Fbig = getFourier(big,0,1,100)
-  Fbigp = getFourier(bigp,0,1,100)
+  Fbig = getFourier(big,0,2,100)
+  Fbigp = getFourier(bigp,0,2,100)
+  Fvh = getFourier(vh,0,2,100)
+  Fg = getFourier(g,0,2,100)
+  Fgdub = getFourier(gdub,0,2,100)
   Fw = getFourier(w,0,1,100)
-  output(Fbig,Fbigp,Fw,Fbigp)
+  output(Fvh,Fgdub,Fbig,Fw)
+end
 
+function level3(v,vp)
+  n = length(v)
+  g = [(-1)^j*v[j+1] for j = 0:n-1]
+  gp = [(-1)^j*vp[j+1] for j = 0:n-1]
+  h = [(-1)^(j-1)*g[j] for j = n:-1:1]
+  hp = [(-1)^(j-1)*gp[j] for j = n:-1:1]
+  vh = [(-1)^(j-1)*v[j] for j = n:-1:1]
+  vhp = [(-1)^(j-1)*vp[j] for j = n:-1:1]
+
+  hdub = space(h,2)
+  hpdub = space(hp,2)
+  gquad = space(g,4)
+  gpquad = space(gp,4)
+
+  big = conv(gquad,conv(hdub,vh))
+  bigp = conv(gpquad,conv(hpdub,vhp))
+  w = zeros(length(big)+length(bigp))
+  for j = 1:length(big)
+      w[2*j-1] = big[j]/sqrt(2)
+      w[2*j] = -bigp[j]/sqrt(2)
+  end
+  Fbig = getFourier(big,0,2,100)
+  Fbigp = getFourier(bigp,0,2,100)
+  PDvh = getPhaseDiff(0,.5,vh, vhp, 0, 2, 100)
+  PDhdub = getPhaseDiff(1,1,hdub, hpdub, 0, 2, 100)
+  PDgquad = getPhaseDiff(-.5,-2,gquad, gpquad, 0, 2, 100)
+  PDbig = getPhaseDiff(0,-.5,big, bigp, 0, 2, 100)
+  Fvh = getFourier(vh,0,2,100)
+  Fg = getFourier(g,0,2,100)
+  Fhdub = getFourier(hdub,0,2,100)
+  Fgquad = getFourier(gquad,0,2,100)
+  Fbig = getFourier(big,0,2,100)
+  output(Fgquad,PDgquad,Fhdub,PDhdub)
 end
 
 
@@ -198,7 +242,7 @@ h = h/sqrt(h'*h)
 w = zeros(length(h)+length(g))
 for j = 1:length(h)
     w[2*j-1] = g[j]/sqrt(2)
-    w[2*j] = h[j]/sqrt(2)
+    w[2*j] = -h[j]/sqrt(2)
 end
 
 Fq = getFourier(q,0,1,100)
@@ -209,6 +253,7 @@ Fb2 = getFourier(bk2,0,1,100)
 Ff = getFourier(f,0,1,100)
 Fw = getFourier(w,0,1,100)
 Fg = getFourier(g,0,1,100)
-phaseDiff = getPhaseDiff(h, g, 0, 1, 100)
-phaseDiff2 = phaseDiff .* Fd
-output(Fq,Fd,Fg,Fw)
+Fh = getFourier(h,0,1,100)
+phaseDiff = getPhaseDiff(0,-.5,g, h, 0, 2, 100)
+#phaseDiff2 = phaseDiff .* Fd
+output(phaseDiff,Fg,Fh,Fw)
